@@ -1,7 +1,8 @@
 version: '3.9'
 
 services:
-  postgres:
+  java_db:
+      container_name: java_db
       image: postgres:14-alpine
       ports:
         - 5432:5432
@@ -10,13 +11,14 @@ services:
         POSTGRES_PASSWORD: secret
         POSTGRES_DB: simple_bookstore
 
-  api:
+  java_api:
+    container_name: java_api
     build: .
     ports:
       - 8080:8080
     environment:
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/simple_bookstore
+      - DATABASE_URL=jdbc:postgresql://java_db:5432/simple_bookstore
       - DATABASE_USERNAME=root
       - DATABASE_PASSWORD=secret
     depends_on:
-      - postgres
+      - java_db

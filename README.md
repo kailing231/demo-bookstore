@@ -1,2 +1,2 @@
-# demoKL
- Simple online bookstore inventory system
+#  Simple online bookstore inventory system
+Written in Java

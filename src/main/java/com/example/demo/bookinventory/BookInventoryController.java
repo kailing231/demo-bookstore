@@ -74,24 +74,6 @@ public class BookInventoryController {
         }
     }
 
-    // @PatchMapping(value = "/stock", consumes = MediaType.APPLICATION_JSON_VALUE,
-    // produces = MediaType.APPLICATION_JSON_VALUE)
-    // public ResponseEntity<?> updateStockValue(
-    // @RequestBody BookInventory book) {
-    // LOGGER.info("Called BookInventoryController.updateStockValue");
-    // try {
-    // BookInventory existingBook = bookInvRepo.findById(book.getId()).get();
-
-    // existingBook.setStock(existingBook.getStock() + book.getStock());
-    // return new ResponseEntity<>(bookInvRepo.save(existingBook), HttpStatus.OK);
-
-    // } catch (Exception e) {
-    // LOGGER.error("Error: id = {}, exception = {}", book.getId(), e.getMessage());
-    // return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL,
-    // HttpStatus.BAD_REQUEST);
-    // }
-    // }
-
     @PatchMapping(value = "/stock", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateStockValue(
             @RequestBody PatchStockInput input) {

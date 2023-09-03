@@ -34,7 +34,7 @@ public class BookInventoryController {
             return new ResponseEntity<>(bookInvRepo.findAll(), HttpStatus.OK);
         } catch (Exception e) {
             LOGGER.error("Error: exception = ", e.getMessage());
-            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -45,7 +45,21 @@ public class BookInventoryController {
             return new ResponseEntity<>(bookInvRepo.findById(id).get(), HttpStatus.OK);
         } catch (Exception e) {
             LOGGER.error("Error: id = {}, exception = {}", id, e.getMessage());
-            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/stock/{id}")
+    public ResponseEntity<?> getStockById(@PathVariable Long id) {
+        LOGGER.info("Called BookInventoryController.getStockById");
+        try {
+            Integer stockVal = bookInvRepo.findStockById(id);
+            if(stockVal == null)
+                return new ResponseEntity<>(GlobalConstants.ERROR_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(stockVal, HttpStatus.OK);
+        } catch (Exception e) {
+            LOGGER.error("Error: id = {}, exception = {}", id, e.getMessage());
+            return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -56,7 +70,7 @@ public class BookInventoryController {
             return new ResponseEntity<>(bookInvRepo.save(book), HttpStatus.OK);
         } catch (Exception e) {
             LOGGER.error("Error: exception = {}", e.getMessage());
-            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -73,7 +87,7 @@ public class BookInventoryController {
 
     // } catch (Exception e) {
     // LOGGER.error("Error: id = {}, exception = {}", book.getId(), e.getMessage());
-    // return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR,
+    // return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL,
     // HttpStatus.BAD_REQUEST);
     // }
     // }
@@ -95,7 +109,7 @@ public class BookInventoryController {
         }
 
         if (hasError)
-            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL, HttpStatus.BAD_REQUEST);
         else
             return new ResponseEntity<>(GlobalConstants.SUCCESS, HttpStatus.OK);
     }
@@ -109,7 +123,7 @@ public class BookInventoryController {
             return new ResponseEntity<>(GlobalConstants.SUCCESS, HttpStatus.OK);
         } catch (Exception e) {
             LOGGER.error("Error: id = {}, exception = {}", id, e.getMessage());
-            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(GlobalConstants.ERROR_GENERAL, HttpStatus.BAD_REQUEST);
         }
     }
 }

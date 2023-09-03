@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bookinventory.util.GlobalConstants;
+import com.example.demo.bookinventory.util.PatchStockInput;
 
 @RestController
 @RequestMapping("/api/books")
@@ -59,20 +60,44 @@ public class BookInventoryController {
         }
     }
 
+    // @PatchMapping(value = "/stock", consumes = MediaType.APPLICATION_JSON_VALUE,
+    // produces = MediaType.APPLICATION_JSON_VALUE)
+    // public ResponseEntity<?> updateStockValue(
+    // @RequestBody BookInventory book) {
+    // LOGGER.info("Called BookInventoryController.updateStockValue");
+    // try {
+    // BookInventory existingBook = bookInvRepo.findById(book.getId()).get();
+
+    // existingBook.setStock(existingBook.getStock() + book.getStock());
+    // return new ResponseEntity<>(bookInvRepo.save(existingBook), HttpStatus.OK);
+
+    // } catch (Exception e) {
+    // LOGGER.error("Error: id = {}, exception = {}", book.getId(), e.getMessage());
+    // return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR,
+    // HttpStatus.BAD_REQUEST);
+    // }
+    // }
+
     @PatchMapping(value = "/stock", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateStockValue(
-            @RequestBody BookInventory book) {
+            @RequestBody PatchStockInput input) {
         LOGGER.info("Called BookInventoryController.updateStockValue");
-        try {
-            BookInventory existingBook = bookInvRepo.findById(book.getId()).get();
-
-            existingBook.setStock(existingBook.getStock() + book.getStock());
-            return new ResponseEntity<>(bookInvRepo.save(existingBook), HttpStatus.OK);
-
-        } catch (Exception e) {
-            LOGGER.error("Error: id = {}, exception = {}", book.getId(), e.getMessage());
-            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+        boolean hasError = false;
+        for (BookInventory book : input.getBooks()) {
+            try {
+                BookInventory existingBook = bookInvRepo.findById(book.getId()).get();
+                existingBook.setStock(existingBook.getStock() + book.getStock());
+                bookInvRepo.save(existingBook);
+            } catch (Exception e) {
+                hasError = true;
+                LOGGER.error("exception = {}", e.getMessage());
+            }
         }
+
+        if (hasError)
+            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
+        else
+            return new ResponseEntity<>(GlobalConstants.SUCCESS, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

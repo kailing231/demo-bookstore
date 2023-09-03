@@ -1,16 +1,20 @@
 package com.example.demo.bookinventory;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.bookinventory.util.GlobalConstants;
 
 @RestController
 @RequestMapping("/api/books")
@@ -20,56 +24,54 @@ public class BookInventoryController {
     private BookInventoryRepository bookInvRepo;
 
     @GetMapping()
-    public List<BookInventory> getAllBooks() {
+    public ResponseEntity<?> getAllBooks() {
         try {
-            return bookInvRepo.findAll();
+            return new ResponseEntity<>(bookInvRepo.findAll(), HttpStatus.OK);
         } catch (Exception e) {
-            return null;
+            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/{id}")
-    public BookInventory getBookById(@PathVariable Long id) {
+    public ResponseEntity<?> getBookById(@PathVariable Long id) {
         try {
-            return bookInvRepo.findById(id).get();
+            return new ResponseEntity<>(bookInvRepo.findById(id).get(), HttpStatus.OK);
         } catch (Exception e) {
-            return null;
+            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping
-    public BookInventory createBook(@RequestBody BookInventory book) {
+    public ResponseEntity<?> createBook(@RequestBody BookInventory book) {
         try {
-            return bookInvRepo.save(book);
+            return new ResponseEntity<>(bookInvRepo.save(book), HttpStatus.OK);
         } catch (Exception e) {
-            return null;
+            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/{id}")
-    public BookInventory updateBook(@PathVariable Long id, @RequestBody BookInventory book) {
+    @PatchMapping(value = "/stock", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateStockValue(
+            @RequestBody BookInventory book) {
         try {
-            BookInventory existingBook = bookInvRepo.findById(id).get();
-            existingBook.setTitle(book.getTitle());
-            existingBook.setAuthor(book.getAuthor());
-            existingBook.setIsbn(book.getIsbn());
-            existingBook.setPrice(book.getPrice());
-            existingBook.setStock(book.getStock());
-            existingBook.setPublicationDate(book.getPublicationDate());
-            return bookInvRepo.save(existingBook);
+            BookInventory existingBook = bookInvRepo.findById(book.getId()).get();
+
+            existingBook.setStock(existingBook.getStock() + book.getStock());
+            return new ResponseEntity<>(bookInvRepo.save(existingBook), HttpStatus.OK);
+
         } catch (Exception e) {
-            return null;
+            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/{id}")
-    public String deleteBook(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
         try {
             bookInvRepo.findById(id).get();
             bookInvRepo.deleteById(id);
-            return "Book deleted successfully";
+            return new ResponseEntity<>(GlobalConstants.SUCCESS, HttpStatus.OK);
         } catch (Exception e) {
-            return "Book not found";
+            return new ResponseEntity<>(GlobalConstants.GENERIC_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 }
